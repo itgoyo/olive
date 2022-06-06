@@ -4,6 +4,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/go-olive/olive/src/config"
 	"github.com/go-olive/olive/src/dispatcher"
 	"github.com/go-olive/olive/src/engine"
 	"github.com/go-olive/olive/src/enum"
@@ -66,7 +67,7 @@ func (m *monitor) refresh() {
 		l.Logger.WithFields(logrus.Fields{
 			"pf": m.show.GetPlatform(),
 			"id": m.show.GetRoomID(),
-		}).Errorf("snap failed, %s", err.Error())
+		}).Tracef("snap failed, %s", err.Error())
 		return
 	}
 	_, roomOn := m.show.StreamUrl()
@@ -100,7 +101,7 @@ func (m *monitor) refresh() {
 
 func (m *monitor) run() {
 	t := jitterbug.New(
-		time.Second*15,
+		time.Second*time.Duration(config.APP.SnapRestSeconds),
 		&jitterbug.Norm{Stdev: time.Second * 3},
 	)
 	defer t.Stop()
